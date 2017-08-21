@@ -4,13 +4,9 @@ version = "1.0-SNAPSHOT"
 
 apply { from(rootProject.file("gradle/versions.gradle.kts")) }
 
-val kotlinVersion: String by extra
-
 dependencies {
     shadow(project(":mu.fn.platform.base"))
     compile(project(":mu.fn.jvm.api"))
-
-    compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlinVersion")
 
     compile("org.xeustechnologies:jcl-core:2.7")
 }

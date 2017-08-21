@@ -5,8 +5,11 @@ import java.net.URI
 
 version = "1.0-SNAPSHOT"
 
+val kotlinVersion: String by extra
+
 buildscript {
-    val kotlinVersion: String by extra { "1.1.4-2" }
+    applyFrom(rootProject.file("gradle/versions.gradle.kts"))
+    val kotlinVersion: String by extra
 
     repositories {
         mavenCentral()
@@ -47,5 +50,9 @@ subprojects {
 
     configure<KotlinProjectExtension> {
         experimental.coroutines = Coroutines.ENABLE
+    }
+
+    dependencies {
+        "compile"("org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlinVersion")
     }
 }
