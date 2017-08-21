@@ -1,0 +1,12 @@
+rootProject.name = 'mu'
+
+include 'mu.master'
+include 'mu.node'
+include 'mu.registry'
+
+include 'mu.fn.platform.base'
+include 'mu.fn.platform.jvm18'
+
+include 'mu.fn.jvm.api'
+include 'mu.fn.jvm.testfn'
+
