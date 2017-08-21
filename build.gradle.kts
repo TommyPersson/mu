@@ -24,7 +24,7 @@ task("wrapper", Wrapper::class) {
     gradleVersion = "4.1"
 }
 
-allprojects {
+subprojects {
     apply {
         plugin("kotlin")
         plugin("propdeps")
@@ -38,9 +38,7 @@ allprojects {
         maven { url = URI("https://dl.bintray.com/kotlin/kotlinx") }
         maven { url = URI("https://dl.bintray.com/kotlin/ktor") }
     }
-}
 
-subprojects {
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             jvmTarget = "1.8"
