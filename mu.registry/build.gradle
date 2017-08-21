@@ -1,5 +1,0 @@
-version '1.0-SNAPSHOT'
-
-dependencies {
-    compile "org.jetbrains.ktor:ktor-netty:$ktor_version"
-}
