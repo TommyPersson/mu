@@ -1,8 +1,8 @@
 package mu.master
 
 import de.mkammerer.argon2.Argon2Factory
-import mu.master.teams_and_users.Password
-import mu.master.teams_and_users.UserId
+import mu.master.teams_and_users.domain.Password
+import mu.master.teams_and_users.domain.UserId
 import org.jetbrains.ktor.application.Application
 import org.jetbrains.ktor.auth.Principal
 import org.jetbrains.ktor.auth.authentication

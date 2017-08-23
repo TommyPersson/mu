@@ -9,6 +9,8 @@ import org.jetbrains.ktor.netty.Netty
 object Main {
     @JvmStatic
     fun main(args: Array<String>) {
+        DI.TeamsAndUsers.teamsView.initialize()
+
         embeddedServer(Netty, Config.port) {
             install(GsonSupport) { configureGson() }
             setupRoutes()
@@ -19,3 +21,4 @@ object Main {
 fun GsonBuilder.configureGson() {
     setPrettyPrinting()
 }
+

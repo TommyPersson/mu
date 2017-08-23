@@ -9,4 +9,6 @@ include 'mu.fn.platform.jvm18'
 
 include 'mu.fn.jvm.api'
 include 'mu.fn.jvm.testfn'
+include 'mu.libs.cqrs'
+include 'mu.libs.utils'
 

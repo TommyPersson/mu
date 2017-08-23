@@ -1,11 +1,12 @@
-version = "1.0-SNAPSHOT"
-
 apply { from(rootProject.file("gradle/versions.gradle.kts")) }
 
 val ktorVersion: String by extra
 val logbackVersion: String by extra
 
 dependencies {
+    compile(project(":mu.libs.cqrs"))
+    compile(project(":mu.libs.utils"))
+
     compile("org.jetbrains.ktor:ktor-netty:$ktorVersion")
     compile("org.jetbrains.ktor:ktor-auth:$ktorVersion")
 

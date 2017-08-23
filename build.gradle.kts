@@ -28,6 +28,8 @@ task("wrapper", Wrapper::class) {
 }
 
 subprojects {
+    version = "1.0-SNAPSHOT"
+
     apply {
         plugin("kotlin")
         plugin("propdeps")

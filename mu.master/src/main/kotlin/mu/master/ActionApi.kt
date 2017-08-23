@@ -1,7 +1,7 @@
 package mu.master
 
-import mu.master.teams_and_users.UserId
-import mu.master.teams_and_users.api.TeamsAndUsersApiActions
+import mu.master.teams_and_users.domain.UserId
+import mu.master.teams_and_users.application.api.TeamsAndUsersApiActions
 import org.jetbrains.ktor.application.ApplicationCall
 import org.jetbrains.ktor.auth.principal
 import org.jetbrains.ktor.request.tryReceive
@@ -20,8 +20,9 @@ private val actionMap = listOf(
         TeamsAndUsersApiActions.all
 ).flatten().associateBy { it.actionId }
 
+@Suppress("UNCHECKED_CAST")
 suspend fun callApiAction(actionId: String, call: ApplicationCall) {
-    val action = actionMap[actionId] ?: throw Exception("no such action")
+    val action = actionMap[actionId] as? ApiAction<Any,Any> ?: throw Exception("no such action")
     val actionInputType = action.inputType
     val input = call.tryReceive(actionInputType) ?: throw Exception("unable to parse input")
     val userId = call.principal<MuUserPrincipal>()?.userId ?: throw Exception("not authenticated")
