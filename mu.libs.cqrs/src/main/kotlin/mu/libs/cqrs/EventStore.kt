@@ -2,25 +2,17 @@ package mu.libs.cqrs
 
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
-import io.reactivex.subjects.ReplaySubject
-import java.util.*
 
-val inMemoryEventStore = InMemoryEventStore()
+val inMemoryEventStore = EventStore(InMemoryEventStorage())
 
-class InMemoryEventStore : IEventStore {
+class EventStore(
+        private val eventStorage: IEventStorage
+) : IEventStore {
 
-    data class EventEnvelope(
-            val aggregateRootId: UUID,
-            val eventData: IEvent,
-            val eventType: String,
-            val version: Int)
-
-    private val store = mutableMapOf<AggregateRootId, MutableList<EventEnvelope>>()
-    private val allEvents = Collections.synchronizedList(mutableListOf<EventEnvelope>())
     private val eventAdditionSubject = BehaviorSubject.createDefault(SequenceNumber(0))
 
     override fun saveEvents(aggregateRootId: AggregateRootId, events: List<IEvent>, expectedVersion: Int) {
-        val storedEvents = getStoredEvents(aggregateRootId)
+        val storedEvents = eventStorage.getEventsForAggregate(aggregateRootId)
 
         synchronized(storedEvents) {
             val lastStoredVersion = storedEvents.lastOrNull()?.version ?: 0
@@ -37,15 +29,14 @@ class InMemoryEventStore : IEventStore {
                         eventType = event.javaClass.simpleName,
                         version = nextVersion)
 
-                storedEvents.add(envelope)
-                allEvents.add(envelope)
-                eventAdditionSubject.onNext(SequenceNumber(allEvents.size))
+                eventStorage.add(envelope)
+                eventAdditionSubject.onNext(SequenceNumber(eventStorage.getAllEvents().size))
             }
         }
     }
 
     override fun getEventHistory(aggregateRootId: AggregateRootId): IEventStream {
-        val eventEnvelopes = getStoredEvents(aggregateRootId)
+        val eventEnvelopes = eventStorage.getEventsForAggregate(aggregateRootId)
         val events = eventEnvelopes.map { it.eventData }
 
         return EventStream(
@@ -56,6 +47,7 @@ class InMemoryEventStore : IEventStore {
 
     override fun replayAllEvents(afterSequence: SequenceNumber, limit: Int): Observable<Pair<IEvent, SequenceNumber>> {
         return Observable.create {
+            val allEvents = eventStorage.getAllEvents()
             val seq = afterSequence.value
             for (i in seq..(seq + limit)) {
                 val envelope = allEvents.getOrNull(i - 1) ?: break
@@ -67,10 +59,6 @@ class InMemoryEventStore : IEventStore {
 
     override fun subscribeForEventAdditions(): Observable<SequenceNumber> {
         return eventAdditionSubject
-    }
-
-    private fun getStoredEvents(aggregateRootId: AggregateRootId): MutableList<EventEnvelope> {
-        return store.getOrPut(aggregateRootId, { mutableListOf() })
     }
 }
 
