@@ -18,6 +18,9 @@ data class EmptyRequestDTO(
 data class ListTeamsResponseDTO(
         val teams: List<TeamDTO>)
 
+data class UserDTO(
+        val id: UUID)
+
 data class TeamDTO(
         val id: UUID,
         val name: String,

@@ -15,6 +15,7 @@ dependencies {
     compile("com.github.salomonbrys.kotson:kotson:2.5.0")
 
     compile("com.graphql-java:graphql-java:2.4.0")
+    compile("com.graphql-java:graphql-java-tools:4.0.0")
 
     compile("de.mkammerer:argon2-jvm:2.2")
 

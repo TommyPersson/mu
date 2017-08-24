@@ -7,10 +7,11 @@ import org.jetbrains.ktor.application.Application
 import org.jetbrains.ktor.auth.Principal
 import org.jetbrains.ktor.auth.authentication
 import org.jetbrains.ktor.auth.basicAuthentication
-import org.jetbrains.ktor.routing.Routing
-import org.jetbrains.ktor.routing.post
-import org.jetbrains.ktor.routing.route
-import org.jetbrains.ktor.routing.routing
+import org.jetbrains.ktor.http.HttpStatusCode
+import org.jetbrains.ktor.request.receiveText
+import org.jetbrains.ktor.response.respond
+import org.jetbrains.ktor.response.respondText
+import org.jetbrains.ktor.routing.*
 import java.util.*
 
 class MuUserPrincipal(val userId: UserId) : Principal
@@ -45,10 +46,17 @@ fun Application.setupRoutes(): Routing {
         }
 
         setupApiRoutes()
+        setupGraphQlRoutes()
     }
 }
 
-fun Routing.setupApiRoutes() {
+private fun Routing.setupGraphQlRoutes() {
+    post("graphql") {
+        callGraphQLApi(call.receiveText(), call)
+    }
+}
+
+private fun Routing.setupApiRoutes() {
     route("api") {
         post("{actionId}") {
             val actionId = call.parameters["actionId"] ?: throw Exception("no action specified")
