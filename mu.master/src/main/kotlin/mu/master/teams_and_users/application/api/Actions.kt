@@ -2,8 +2,8 @@ package mu.master.teams_and_users.application.api
 
 import mu.master.ApiAction
 import mu.master.DI
-import mu.master.teams_and_users.application.CommandHandlers
 import mu.master.teams_and_users.application.CreateTeam
+import mu.master.teams_and_users.application.teamsCommandHandlers
 import mu.master.teams_and_users.domain.TeamId
 import mu.master.teams_and_users.domain.UserId
 import mu.master.teams_and_users.views.ITeamsView
@@ -20,7 +20,7 @@ class CreateTeamAction : ApiAction<CreateTeamRequestDTO, CreateTeamResponseDTO>(
 
         val newTeamId = TeamId.create()
 
-        CommandHandlers.handle(CreateTeam(
+        teamsCommandHandlers.handle(CreateTeam(
                 teamId = newTeamId,
                 teamAdmin = UserId(input.teamAdminUserId),
                 displayName = input.name,
