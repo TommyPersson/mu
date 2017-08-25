@@ -1,6 +1,7 @@
 package mu.master.teams_and_users.views
 
 import mu.libs.cqrs.*
+import mu.libs.cqrs.store.IEventStore
 import mu.master.teams_and_users.application.api.TeamDTO
 import mu.master.teams_and_users.application.api.UserDTO
 import mu.master.teams_and_users.domain.TeamCreated

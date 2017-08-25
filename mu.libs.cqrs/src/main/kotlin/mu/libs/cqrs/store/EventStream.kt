@@ -1,4 +1,6 @@
-package mu.libs.cqrs
+package mu.libs.cqrs.store
+
+import mu.libs.cqrs.IEvent
 
 class EventStream(
         override val events: List<IEvent>,

@@ -1,5 +1,6 @@
 package mu.libs.cqrs
 
+import mu.libs.cqrs.store.IEventStore
 import java.util.*
 
 open class AbstractRepository<TAggregate : AggregateRoot>(

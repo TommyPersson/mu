@@ -1,22 +1,28 @@
-package mu.libs.cqrs
+package mu.libs.cqrs.store
 
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
+import mu.libs.cqrs.AggregateRootId
+import mu.libs.cqrs.IEvent
+import java.io.File
 
-val inMemoryEventStore = EventStore(InMemoryEventStorage())
 
 class EventStore(
         private val eventStorage: IEventStorage
 ) : IEventStore {
 
+    companion object {
+        fun createInMemoryEventStore() = EventStore(InMemoryEventStorage())
+
+        fun createJsonFileEventStore(file: File) = EventStore(JsonFileEventStorage(file))
+    }
+
     private val eventAdditionSubject = BehaviorSubject.createDefault(SequenceNumber(0))
 
     override fun saveEvents(aggregateRootId: AggregateRootId, events: List<IEvent>, expectedVersion: Int) {
-        val storedEvents = eventStorage.getEventsForAggregate(aggregateRootId)
+        eventStorage.transact(aggregateRootId) { version ->
 
-        synchronized(storedEvents) {
-            val lastStoredVersion = storedEvents.lastOrNull()?.version ?: 0
-            if (lastStoredVersion != expectedVersion) {
+            if (version != expectedVersion) {
                 throw OptimisticConcurrencyException()
             }
 
@@ -26,10 +32,10 @@ class EventStore(
                 val envelope = EventEnvelope(
                         aggregateRootId = aggregateRootId.id,
                         eventData = event,
-                        eventType = event.javaClass.simpleName,
+                        eventType = event.javaClass.canonicalName,
                         version = nextVersion)
 
-                eventStorage.add(envelope)
+                appendToLog(envelope)
                 eventAdditionSubject.onNext(SequenceNumber(eventStorage.getAllEvents().size))
             }
         }

@@ -1,6 +1,8 @@
-package mu.libs.cqrs
+package mu.libs.cqrs.store
 
 import io.reactivex.Observable
+import mu.libs.cqrs.AggregateRootId
+import mu.libs.cqrs.IEvent
 
 
 interface IEventStore {

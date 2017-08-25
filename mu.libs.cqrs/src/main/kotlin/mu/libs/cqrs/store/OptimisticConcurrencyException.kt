@@ -1,3 +1,3 @@
-package mu.libs.cqrs
+package mu.libs.cqrs.store
 
 class OptimisticConcurrencyException : RuntimeException()

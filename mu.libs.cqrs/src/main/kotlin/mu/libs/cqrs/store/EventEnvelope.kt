@@ -1,5 +1,6 @@
-package mu.libs.cqrs
+package mu.libs.cqrs.store
 
+import mu.libs.cqrs.IEvent
 import java.util.*
 
 data class EventEnvelope(

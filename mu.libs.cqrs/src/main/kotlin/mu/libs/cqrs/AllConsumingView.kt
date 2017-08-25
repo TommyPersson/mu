@@ -1,5 +1,8 @@
 package mu.libs.cqrs
 
+import mu.libs.cqrs.store.IEventStore
+import mu.libs.cqrs.store.SequenceNumber
+
 abstract class AllConsumingView(
         private val eventStore: IEventStore
 ) : IView {
@@ -7,21 +10,25 @@ abstract class AllConsumingView(
 
     override fun initialize() {
         eventStore.subscribeForEventAdditions().subscribe {
-            val nextSequence = SequenceNumber(lastSequence.value + 1)
-            eventStore.replayAllEvents(nextSequence, 200).subscribe {
-                synchronized(this) {
-                    val event = it.first
-                    val sequence = it.second
+            fetchNewEvents()
+        }
 
-                    if (lastSequence == SequenceNumber(sequence.value - 1)) {
-                        handle(event)
-                        lastSequence = sequence
-                    }
+        fetchNewEvents()
+    }
+
+    private fun fetchNewEvents() {
+        val nextSequence = SequenceNumber(lastSequence.value + 1)
+        eventStore.replayAllEvents(nextSequence, 200).subscribe {
+            synchronized(this) {
+                val event = it.first
+                val sequence = it.second
+
+                if (lastSequence == SequenceNumber(sequence.value - 1)) {
+                    handle(event)
+                    lastSequence = sequence
                 }
             }
         }
-
-        // TODO: load all existing events
     }
 
     protected abstract fun handle(event: IEvent)
