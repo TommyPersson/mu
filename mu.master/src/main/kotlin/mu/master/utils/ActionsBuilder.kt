@@ -1,16 +1,16 @@
 package mu.master.utils
 
+import mu.master.ActionContext
 import mu.master.ApiAction
-import mu.master.teams_and_users.domain.UserId
 
 
 class ActionsBuilder {
     val actions = mutableListOf<ApiAction<*, *>>()
 
-    inline fun <reified I : Any, reified O : Any> actionOf(id: String, crossinline actionFn: (I, UserId) -> O) {
+    inline fun <reified I : Any, reified O : Any> actionOf(id: String, crossinline actionFn: (I, ActionContext) -> O) {
         val action = object : ApiAction<I, O>(id, I::class) {
-            suspend override fun invoke(userId: UserId, input: I): O {
-                return actionFn(input, userId)
+            suspend override fun invoke(input: I, context: ActionContext): O {
+                return actionFn(input, context)
             }
         }
 

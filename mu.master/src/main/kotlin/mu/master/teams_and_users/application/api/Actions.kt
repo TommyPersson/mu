@@ -11,19 +11,19 @@ val teamsAndUsersApiActions = createActions {
 
     val teamsView = DI.TeamsAndUsers.teamsView
 
-    actionOf<CreateTeamRequestDTO, CreateTeamResponseDTO>("teams.create") { input, userId ->
+    actionOf<CreateTeamRequestDTO, CreateTeamResponseDTO>("teams.create") { input, context ->
         val newTeamId = TeamId.create()
 
         teamsCommandHandlers.handle(CreateTeam(
                 teamId = newTeamId,
                 teamAdmin = UserId(input.teamAdminUserId),
                 displayName = input.name,
-                byUser = userId))
+                byUser = context.userPrincipal.userId))
 
         CreateTeamResponseDTO(teamId = newTeamId.value)
     }
 
-    actionOf<EmptyRequestDTO, ListTeamsResponseDTO>("teams.list") { _, userId ->
+    actionOf<EmptyRequestDTO, ListTeamsResponseDTO>("teams.list") { _, _ ->
         val teams = teamsView.teams
 
         ListTeamsResponseDTO(teams)
