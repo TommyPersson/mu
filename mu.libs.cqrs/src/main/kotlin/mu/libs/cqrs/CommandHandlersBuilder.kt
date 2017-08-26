@@ -1,5 +1,6 @@
 package mu.libs.cqrs
 
+import mu.libs.utils.getLogger
 
 class CommandHandlersBuilder {
     val handlers = mutableMapOf<Class<*>, ICommandHandler<*>>()
@@ -13,12 +14,19 @@ class CommandHandlersBuilder {
     }
 
     fun build(): ICommandHandler<ICommand> {
-        return object : ICommandHandler<ICommand> {
-            @Suppress("UNCHECKED_CAST")
-            override fun handle(command: ICommand) {
-                val commandHandler = handlers[command.javaClass]!! as ICommandHandler<ICommand>
-                commandHandler.handle(command)
-            }
+        return GenericCommandHandler(handlers)
+    }
+
+    private class GenericCommandHandler(
+            private val handlers: Map<Class<*>, ICommandHandler<*>>
+    ) : ICommandHandler<ICommand> {
+        private val logger = getLogger()
+
+        @Suppress("UNCHECKED_CAST")
+        override fun handle(command: ICommand) {
+            logger.info("Handling command: $command")
+            val commandHandler = handlers[command.javaClass]!! as ICommandHandler<ICommand>
+            commandHandler.handle(command)
         }
     }
 }

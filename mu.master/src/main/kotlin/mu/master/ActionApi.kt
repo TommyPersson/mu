@@ -1,7 +1,7 @@
 package mu.master
 
+import mu.master.teams_and_users.application.api.teamsAndUsersApiActions
 import mu.master.teams_and_users.domain.UserId
-import mu.master.teams_and_users.application.api.TeamsAndUsersApiActions
 import org.jetbrains.ktor.application.ApplicationCall
 import org.jetbrains.ktor.auth.principal
 import org.jetbrains.ktor.request.tryReceive
@@ -17,7 +17,7 @@ abstract class ApiAction<I : Any, out O>(
 }
 
 private val actionMap = listOf(
-        TeamsAndUsersApiActions.all
+        teamsAndUsersApiActions
 ).flatten().associateBy { it.actionId }
 
 @Suppress("UNCHECKED_CAST")

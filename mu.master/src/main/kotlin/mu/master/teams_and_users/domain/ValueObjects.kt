@@ -2,22 +2,21 @@ package mu.master.teams_and_users.domain
 
 import java.util.*
 
-
-data class UserId(val value: UUID) {
+abstract class EntityId(
+        val value: UUID
+) {
     override fun toString(): String {
-        return value.toString()
+        return "${javaClass.simpleName}($value)"
     }
 }
 
-data class TeamId(val value: UUID) {
+class UserId(value: UUID) : EntityId(value)
+
+class TeamId(value: UUID) : EntityId(value) {
     companion object {
         fun create(): TeamId {
             return TeamId(UUID.randomUUID())
         }
-    }
-
-    override fun toString(): String {
-        return value.toString()
     }
 }
 
