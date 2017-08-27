@@ -1,6 +1,6 @@
 package mu.master.identity.domain
 
-import mu.master.teams_and_users.domain.EntityId
+import mu.master.common.EntityId
 import java.util.*
 
 class UserId(value: UUID) : EntityId(value) {
