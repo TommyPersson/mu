@@ -8,8 +8,9 @@ import graphql.schema.GraphQLList
 import graphql.schema.GraphQLObjectType.newObject
 import graphql.schema.GraphQLSchema.newSchema
 import graphql.schema.GraphQLTypeReference
+import mu.master.identity.application.api.UserDTO
 import mu.master.teams_and_users.application.api.TeamDTO
-import mu.master.teams_and_users.application.api.UserDTO
+import mu.master.teams_and_users.application.api.UserDTO as TeamUserDTO
 import mu.master.teams_and_users.domain.TeamId
 import org.jetbrains.ktor.application.ApplicationCall
 import org.jetbrains.ktor.http.HttpStatusCode
@@ -20,6 +21,12 @@ class MyGraphQL {
             .name("User")
             .field(newFieldDefinition()
                     .name("id")
+                    .type(GraphQLString))
+            .field(newFieldDefinition()
+                    .name("displayName")
+                    .type(GraphQLString))
+            .field(newFieldDefinition()
+                    .name("email")
                     .type(GraphQLString))
             .field(newFieldDefinition()
                     .name("memberOf")
@@ -40,11 +47,22 @@ class MyGraphQL {
                     .name("name")
                     .type(GraphQLString))
             .field(newFieldDefinition()
+                    .name("admin")
+                    .type(userType)
+                    .dataFetcher {
+                        val source = it.getSource<TeamDTO>()
+                        val adminId = source.teamAdminId
+                        val result = DI.Identity.identityView.userAccountsById[adminId]
+                        result
+                    })
+            .field(newFieldDefinition()
                     .name("members")
                     .type(GraphQLList(userType))
                     .dataFetcher {
                         val source = it.getSource<TeamDTO>()
-                        DI.TeamsAndUsers.teamsView.usersByTeam[TeamId(source.id)] ?: emptySet<UserDTO>()
+                        val teamUsersDTOs = DI.TeamsAndUsers.teamsView.usersByTeam[TeamId(source.id)] ?: emptySet()
+                        val result = teamUsersDTOs.mapNotNull { DI.Identity.identityView.userAccountsById[it.id] }
+                        result
                     })
             .build()
 
@@ -58,7 +76,7 @@ class MyGraphQL {
             .field(newFieldDefinition()
                     .name("users")
                     .type(GraphQLList(userType))
-                    .dataFetcher { DI.TeamsAndUsers.teamsView.usersByTeam.values.flatten().distinct() })
+                    .dataFetcher { DI.Identity.identityView.userAccountsById.values })
             .build()
 
     private val gqlSchema = newSchema()

@@ -7,18 +7,18 @@ import mu.master.teams_and_users.domain.TeamId
 import mu.master.teams_and_users.domain.UserId
 import mu.master.utils.createActions
 
-val teamsAndUsersApiActions = createActions {
+val teamsAndUsersContextActions = createActions {
 
     val teamsView = DI.TeamsAndUsers.teamsView
 
     actionOf<CreateTeamRequestDTO, CreateTeamResponseDTO>("teams.create") { input, context ->
-        val newTeamId = TeamId.create()
+        val newTeamId = TeamId.new()
 
         teamsCommandHandlers.handle(CreateTeam(
                 teamId = newTeamId,
                 teamAdmin = UserId(input.teamAdminUserId),
                 displayName = input.name,
-                byUser = context.userPrincipal.userId))
+                byUser = context.userPrincipal!!.userId))
 
         CreateTeamResponseDTO(teamId = newTeamId.value)
     }

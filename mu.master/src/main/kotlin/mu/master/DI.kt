@@ -2,6 +2,14 @@ package mu.master
 
 import mu.libs.cqrs.store.EventStore
 import mu.libs.cqrs.store.IEventStore
+import mu.master.identity.domain.IUserAccountRepository
+import mu.master.identity.domain.services.IEmailAvailabilityChecker
+import mu.master.identity.domain.services.IPasswordHasher
+import mu.master.identity.infrastructure.EmailAvailabilityChecker
+import mu.master.identity.infrastructure.PasswordHasher
+import mu.master.identity.infrastructure.UserAccountRepository
+import mu.master.identity.views.IIdentityView
+import mu.master.identity.views.IdentityView
 import mu.master.teams_and_users.domain.ITeamRepository
 import mu.master.teams_and_users.infrastructure.TeamRepository
 import mu.master.teams_and_users.views.ITeamsView
@@ -10,11 +18,20 @@ import java.io.File
 
 object DI { // TODO Checkout https://salomonbrys.github.io/Kodein/?
     object Common {
-        val eventStore: IEventStore = EventStore.createJsonFileEventStore(File(System.getProperty("user.home"), ".mu/master/event-store.json"))
+
+    }
+
+    object Identity {
+        private val eventStore: IEventStore = EventStore.createJsonFileEventStore(File(System.getProperty("user.home"), ".mu/master/identity/event-store.json"))
+        val identityView: IIdentityView = IdentityView(eventStore)
+        val userAccountRepository: IUserAccountRepository = UserAccountRepository(eventStore)
+        val passwordHasher: IPasswordHasher = PasswordHasher()
+        val emailAvailabilityChecker: IEmailAvailabilityChecker = EmailAvailabilityChecker(identityView)
     }
 
     object TeamsAndUsers {
-        val teamsView: ITeamsView = TeamsView(DI.Common.eventStore)
-        val teamRepository: ITeamRepository = TeamRepository(DI.Common.eventStore)
+        private val eventStore: IEventStore = EventStore.createJsonFileEventStore(File(System.getProperty("user.home"), ".mu/master/teams-and-users/event-store.json"))
+        val teamsView: ITeamsView = TeamsView(eventStore)
+        val teamRepository: ITeamRepository = TeamRepository(eventStore)
     }
 }

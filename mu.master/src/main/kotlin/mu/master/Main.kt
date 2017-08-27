@@ -9,7 +9,10 @@ import org.jetbrains.ktor.netty.Netty
 object Main {
     @JvmStatic
     fun main(args: Array<String>) {
+        DI.Identity.identityView.initialize()
         DI.TeamsAndUsers.teamsView.initialize()
+
+        // TODO make view.initialize block until caught up
 
         embeddedServer(Netty, Config.port) {
             install(GsonSupport) { configureGson() }
