@@ -8,7 +8,7 @@ import mu.libs.cqrs.IEvent
 interface IEventStore {
     fun saveEvents(aggregateRootId: AggregateRootId, events: List<IEvent>, expectedVersion: Int)
 
-    fun getEventHistory(aggregateRootId: AggregateRootId): IEventStream
+    fun getEventHistory(aggregateRootId: AggregateRootId): IEventStream?
 
     fun replayAllEvents(afterSequence: SequenceNumber, limit: Int): Observable<Pair<IEvent, SequenceNumber>>
 

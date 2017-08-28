@@ -58,8 +58,8 @@ class JsonFileEventStorage(
         }
     }
 
-    override fun getEventsForAggregate(aggregateRootId: AggregateRootId): List<EventEnvelope> {
-        return store[aggregateRootId] ?: emptyList()
+    override fun getEventsForAggregate(aggregateRootId: AggregateRootId): List<EventEnvelope>? {
+        return store[aggregateRootId]
     }
 
     override fun getAllEvents(): List<EventEnvelope> {

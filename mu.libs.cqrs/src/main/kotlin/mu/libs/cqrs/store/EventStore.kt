@@ -41,8 +41,8 @@ class EventStore(
         }
     }
 
-    override fun getEventHistory(aggregateRootId: AggregateRootId): IEventStream {
-        val eventEnvelopes = eventStorage.getEventsForAggregate(aggregateRootId)
+    override fun getEventHistory(aggregateRootId: AggregateRootId): IEventStream? {
+        val eventEnvelopes = eventStorage.getEventsForAggregate(aggregateRootId) ?: return null
         val events = eventEnvelopes.map { it.eventData }
 
         return EventStream(

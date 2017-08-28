@@ -5,7 +5,7 @@ import mu.libs.cqrs.AggregateRootId
 interface IEventStorage {
     fun transact(aggregateRootId: AggregateRootId, transactor: IEventTransaction.(Int) -> Unit)
 
-    fun getEventsForAggregate(aggregateRootId: AggregateRootId): List<EventEnvelope>
+    fun getEventsForAggregate(aggregateRootId: AggregateRootId): List<EventEnvelope>?
 
     fun getAllEvents(): List<EventEnvelope>
 

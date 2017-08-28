@@ -8,8 +8,8 @@ class InMemoryEventStorage : IEventStorage {
     private val store = mutableMapOf<AggregateRootId, MutableList<EventEnvelope>>()
     private val allEvents = Collections.synchronizedList(mutableListOf<EventEnvelope>())
 
-    override fun getEventsForAggregate(aggregateRootId: AggregateRootId): List<EventEnvelope> {
-        return store[aggregateRootId] ?: emptyList()
+    override fun getEventsForAggregate(aggregateRootId: AggregateRootId): List<EventEnvelope>? {
+        return store[aggregateRootId]
     }
 
     override fun getAllEvents(): List<EventEnvelope> {

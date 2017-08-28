@@ -9,7 +9,7 @@ open class AbstractRepository<TAggregate : AggregateRoot>(
 ): IRepository<TAggregate> {
 
     override fun getById(id: UUID): TAggregate? {
-        val eventStream = eventStore.getEventHistory(AggregateRootId(id))
+        val eventStream = eventStore.getEventHistory(AggregateRootId(id)) ?: return null
 
         return aggregateFactory().apply {
             loadFromHistory(eventStream.events.asSequence(), eventStream.version)
