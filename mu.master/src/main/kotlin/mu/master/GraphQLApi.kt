@@ -66,8 +66,8 @@ class MyGraphQL {
                     .type(GraphQLList(userType))
                     .dataFetcher {
                         val source = it.getSource<TeamDTO>()
-                        val teamUsersDTOs = DI.TeamsAndUsers.teamsView.usersByTeam[TeamId(source.id)] ?: emptySet()
-                        val result = teamUsersDTOs.mapNotNull { DI.Identity.identityView.userAccountsById[it.id] }
+                        val userIds = DI.TeamsAndUsers.teamsView.teamsById[source.id]?.memberIds ?: emptySet()
+                        val result = userIds.mapNotNull { DI.Identity.identityView.userAccountsById[it] }
                         result
                     })
             .build()
