@@ -21,7 +21,7 @@ private fun Routing.setupGraphQlRoutes() {
         setupAuthentication()
 
         post {
-            callGraphQLApi(call.receiveText(), call)
+            callGraphQLApi(call)
         }
     }
 }

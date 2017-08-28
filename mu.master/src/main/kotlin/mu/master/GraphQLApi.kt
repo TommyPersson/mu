@@ -2,6 +2,7 @@ package mu.master
 
 import graphql.ExecutionResult
 import graphql.GraphQL
+import graphql.GraphQLError
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLList
@@ -13,7 +14,12 @@ import mu.master.teams_and_users.application.api.TeamDTO
 import mu.master.teams_and_users.application.api.UserDTO as TeamUserDTO
 import mu.master.teams_and_users.domain.TeamId
 import org.jetbrains.ktor.application.ApplicationCall
+import org.jetbrains.ktor.http.ContentType
+import org.jetbrains.ktor.http.HttpMethod
 import org.jetbrains.ktor.http.HttpStatusCode
+import org.jetbrains.ktor.request.contentType
+import org.jetbrains.ktor.request.httpMethod
+import org.jetbrains.ktor.request.receiveText
 import org.jetbrains.ktor.response.respond
 
 class MyGraphQL {
@@ -90,22 +96,24 @@ class MyGraphQL {
 
 private val graphQL = MyGraphQL()
 
-suspend fun callGraphQLApi(query: String, call: ApplicationCall) {
+data class GraphQLResponseDTO(
+        val data: Any?,
+        val errors: List<GraphQLError>
+)
+
+suspend fun callGraphQLApi(call: ApplicationCall) {
+    if (call.request.httpMethod != HttpMethod.Post || call.request.contentType() != ContentType.parse("application/graphql")) {
+        call.respond(HttpStatusCode.NotImplemented)
+        return
+    }
+
+    val query = call.receiveText()
     val result = graphQL.execute(query)
-    if (result.errors.any()) {
-        result.errors.forEach {
-            println(it)
-        }
-        call.response.status(HttpStatusCode.InternalServerError)
-        call.respond("")
-        return
+
+    val response = GraphQLResponseDTO(result.getData(), result.errors)
+    if (response.errors.any()) {
+        call.response.status(HttpStatusCode.BadRequest)
     }
 
-    val resultData = result.getData<Any>()
-    if (resultData == null) {
-        call.respond(Any())
-        return
-    }
-
-    call.respond(resultData)
+    call.respond(response)
 }
