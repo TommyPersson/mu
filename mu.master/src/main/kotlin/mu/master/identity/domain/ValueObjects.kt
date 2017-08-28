@@ -9,6 +9,4 @@ class UserId(value: UUID) : EntityId(value) {
     }
 }
 
-data class PasswordHash(
-    val salt: String,
-    val hash: String)
+data class PasswordHash(val value: String)
