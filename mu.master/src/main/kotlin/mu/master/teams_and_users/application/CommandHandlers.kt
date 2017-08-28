@@ -10,7 +10,7 @@ val teamsCommandHandlers = createCommandHandlers {
     val userExistenceChecker = DI.TeamsAndUsers.userExistenceChecker
 
     handlerOf<CreateTeam> {
-        val team = Team(it.teamId, it.displayName, it.teamAdmin, it.byUser)
+        val team = Team(it.teamId, it.displayName, it.teamAdmin, it.byUser, userExistenceChecker)
         teamRepository.save(team)
     }
 

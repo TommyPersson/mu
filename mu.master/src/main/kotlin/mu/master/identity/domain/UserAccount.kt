@@ -23,9 +23,7 @@ class UserAccount() : AggregateRoot() {
             emailAvailabilityChecker: IEmailAvailabilityChecker,
             passwordHasher: IPasswordHasher) : this() {
 
-        if (!emailAvailabilityChecker.isEmailAvailable(email)) {
-            throw IllegalArgumentException("Email is not available")
-        }
+        require(emailAvailabilityChecker.isEmailAvailable(email)) { "Email <$email> is not available" }
 
         val passwordHash = passwordHasher.createPasswordHash(plainPassword)
 

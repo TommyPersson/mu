@@ -17,39 +17,25 @@ class Team() : AggregateRoot() {
 
     override val id: AggregateRootId get() = AggregateRootId(_id.value)
 
-    constructor(teamId: TeamId, displayName: String, teamAdmin: UserId, createdBy: UserId): this() {
-        // TODO: who can create teams? SiteAdmin?
+    constructor(teamId: TeamId, displayName: String, teamAdmin: UserId, createdBy: UserId, userExistenceChecker: IUserExistenceChecker): this() {
+        require(userExistenceChecker.doesUserExist(teamAdmin)) {"User <$teamAdmin> does not exist!" }
+        require(userExistenceChecker.doesUserExist(createdBy)) {"User <$createdBy> does not exist!" }
+
         applyChange(TeamCreated(teamId, teamAdmin, displayName, createdBy))
     }
 
     fun addUser(userId: UserId, byUser: UserId, userExistenceChecker: IUserExistenceChecker) {
-        if (!userExistenceChecker.doesUserExist(userId)) {
-            throw IllegalArgumentException("User <$userId> does not exist!")
-        }
-
-        if (byUser != teamAdmin) {
-            throw IllegalArgumentException("User <$byUser> is not allowed to add members to team <$_id>")
-        }
-
-        if (teamMembers.contains(userId)) {
-            throw IllegalArgumentException("User <$userId> is already a member of team <$_id>")
-        }
+        require(userExistenceChecker.doesUserExist(teamAdmin)) { "User <$userId> does not exist!" }
+        require(byUser == teamAdmin) { "User <$byUser> is not allowed to add members to team <$_id>" }
+        require(!teamMembers.contains(userId)) { "User <$userId> is already a member of team <$_id>" }
 
         applyChange(UserAddedToTeam(team = _id, user = userId, byUser = byUser))
     }
 
     fun removeUser(userId: UserId, byUser: UserId) {
-        if (byUser != teamAdmin) {
-            throw IllegalArgumentException("User <$byUser> is not allowed to add members to team <$_id>")
-        }
-
-        if (!teamMembers.contains(userId)) {
-            throw IllegalArgumentException("User <$userId> is not a member of team <$_id>")
-        }
-
-        if (userId == teamAdmin) {
-            throw IllegalArgumentException("Cannot remove the team admin from the team")
-        }
+        require(byUser == teamAdmin) { "User <$byUser> is not allowed to add members to team <$_id>" }
+        require(teamMembers.contains(userId)) { "User <$userId> is not a member of team <$_id>" }
+        require(userId != teamAdmin) { "Cannot remove the team admin from the team" }
 
         applyChange(UserRemovedFromTeam(team = _id, user = userId, byUser = byUser))
     }
