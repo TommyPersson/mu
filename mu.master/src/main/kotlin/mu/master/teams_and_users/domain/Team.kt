@@ -4,6 +4,7 @@ import mu.libs.cqrs.AggregateRoot
 import mu.libs.cqrs.AggregateRootId
 import mu.libs.cqrs.IEvent
 import mu.libs.utils.getLogger
+import mu.master.teams_and_users.domain.services.IUserExistenceChecker
 
 class Team() : AggregateRoot() {
 
@@ -21,8 +22,11 @@ class Team() : AggregateRoot() {
         applyChange(TeamCreated(teamId, teamAdmin, displayName, createdBy))
     }
 
-    fun addUser(userId: UserId, byUser: UserId) {
-        // TODO: where to verify that the users exist? here (domain), or command handler (application)?
+    fun addUser(userId: UserId, byUser: UserId, userExistenceChecker: IUserExistenceChecker) {
+        if (!userExistenceChecker.doesUserExist(userId)) {
+            throw IllegalArgumentException("User <$userId> does not exist!")
+        }
+
         if (byUser != teamAdmin) {
             throw IllegalArgumentException("User <$byUser> is not allowed to add members to team <$_id>")
         }

@@ -20,4 +20,10 @@ open class AbstractRepository<TAggregate : AggregateRoot>(
         eventStore.saveEvents(aggregate.id, aggregate.uncommittedChanges, aggregate.version)
         aggregate.markAllChangesAsCommitted()
     }
+
+    override fun update(id: UUID, updateFn: (TAggregate) -> Unit) {
+        val aggregate = getById(id) ?: return
+        updateFn(aggregate)
+        save(aggregate)
+    }
 }
