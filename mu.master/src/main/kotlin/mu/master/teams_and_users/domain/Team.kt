@@ -24,20 +24,20 @@ class Team() : AggregateRoot() {
         applyChange(TeamCreated(teamId, teamAdmin, displayName, createdBy))
     }
 
-    fun addUser(userId: UserId, byUser: UserId, userExistenceChecker: IUserExistenceChecker) {
-        require(userExistenceChecker.doesUserExist(teamAdmin)) { "User <$userId> does not exist!" }
+    fun addUser(newUser: UserId, byUser: UserId, userExistenceChecker: IUserExistenceChecker) {
+        require(userExistenceChecker.doesUserExist(newUser)) { "User <$newUser> does not exist!" }
         require(byUser == teamAdmin) { "User <$byUser> is not allowed to add members to team <$_id>" }
-        require(!teamMembers.contains(userId)) { "User <$userId> is already a member of team <$_id>" }
+        require(!teamMembers.contains(newUser)) { "User <$newUser> is already a member of team <$_id>" }
 
-        applyChange(UserAddedToTeam(team = _id, user = userId, byUser = byUser))
+        applyChange(UserAddedToTeam(team = _id, user = newUser, byUser = byUser))
     }
 
-    fun removeUser(userId: UserId, byUser: UserId) {
+    fun removeUser(user: UserId, byUser: UserId) {
         require(byUser == teamAdmin) { "User <$byUser> is not allowed to add members to team <$_id>" }
-        require(teamMembers.contains(userId)) { "User <$userId> is not a member of team <$_id>" }
-        require(userId != teamAdmin) { "Cannot remove the team admin from the team" }
+        require(teamMembers.contains(user)) { "User <$user> is not a member of team <$_id>" }
+        require(user != teamAdmin) { "Cannot remove the team admin from the team" }
 
-        applyChange(UserRemovedFromTeam(team = _id, user = userId, byUser = byUser))
+        applyChange(UserRemovedFromTeam(team = _id, user = user, byUser = byUser))
     }
 
     override fun apply(event: IEvent) {
