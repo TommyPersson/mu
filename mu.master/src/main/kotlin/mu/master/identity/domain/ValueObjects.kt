@@ -10,3 +10,5 @@ class UserId(value: UUID) : EntityId(value) {
 }
 
 data class PasswordHash(val value: String)
+
+data class AuthToken(val value: String)

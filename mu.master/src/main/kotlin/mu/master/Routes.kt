@@ -1,12 +1,12 @@
 package mu.master
 
-import mu.master.teams_and_users.domain.UserId
+import mu.master.identity.domain.UserId
+import mu.master.utils.jwtClaimsAuthentication
 import org.jetbrains.ktor.application.Application
 import org.jetbrains.ktor.auth.Principal
 import org.jetbrains.ktor.auth.authentication
-import org.jetbrains.ktor.auth.basicAuthentication
-import org.jetbrains.ktor.request.receiveText
 import org.jetbrains.ktor.routing.*
+import java.util.*
 
 
 fun Application.setupRoutes(): Routing {
@@ -41,20 +41,20 @@ private fun Routing.setupApiRoutes() {
     }
 }
 
-class MuUserPrincipal(val userId: UserId) : Principal
+class MuUserPrincipal(val userId: UUID) : Principal
 
 private fun Route.setupAuthentication() {
     authentication {
-        basicAuthentication("mu.master") { (email, password) ->
-            val userAccountRepository = DI.Identity.userAccountRepository
-            val userId = DI.Identity.identityView.userAccountsByEmail[email]?.id ?: return@basicAuthentication null
-            val user = userAccountRepository.getById(userId) ?: return@basicAuthentication null
+        jwtClaimsAuthentication(DI.Identity.authTokenCreator.signingKey) { (jwt) ->
+            val identityService = DI.Identity.identityService
+            val userId = UUID.fromString(jwt.body.subject)
 
-            val isAuthenticated = user.authenticate(password, DI.Identity.passwordHasher)
-
-            if (isAuthenticated) {
-                MuUserPrincipal(UserId(userId))
-            } else null
+            if (identityService.doesUserExist(UserId(userId))) {
+                MuUserPrincipal(userId)
+            } else {
+                null
+            }
         }
     }
 }
+

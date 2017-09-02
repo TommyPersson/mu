@@ -21,7 +21,7 @@ val teamsAndUsersContextActions = createActions {
 
     actionOf<CreateTeamRequestDTO, CreateTeamResponseDTO>("teams.create") { input, context ->
         val newTeamId = TeamId.new()
-        val currentUserId = context.userPrincipal!!.userId
+        val currentUserId = UserId(context.userPrincipal!!.userId)
 
         teamsCommandHandlers.handle(CreateTeam(
                 teamId = newTeamId,
@@ -35,7 +35,7 @@ val teamsAndUsersContextActions = createActions {
     actionOf<AddUserToTeamRequestDTO, EmptyResponseDTO>("teams.add-user") { input, context ->
         val teamId = TeamId(input.teamId)
         val userId = UserId(input.userId)
-        val currentUserId = context.userPrincipal!!.userId
+        val currentUserId = UserId(context.userPrincipal!!.userId)
 
         teamsCommandHandlers.handle(AddUserToTeam(
                 team = teamId,
@@ -48,7 +48,7 @@ val teamsAndUsersContextActions = createActions {
     actionOf<AddUserToTeamRequestDTO, EmptyResponseDTO>("teams.remove-user") { input, context ->
         val teamId = TeamId(input.teamId)
         val userId = UserId(input.userId)
-        val currentUserId = context.userPrincipal!!.userId
+        val currentUserId = UserId(context.userPrincipal!!.userId)
 
         teamsCommandHandlers.handle(RemoveUserFromTeam(
                 team = teamId,

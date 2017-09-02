@@ -11,9 +11,11 @@ import java.util.concurrent.ConcurrentHashMap
 class IdentityView(eventStore: IEventStore) : IIdentityView, AllConsumingView(eventStore) {
     private val _userAccountsById = ConcurrentHashMap<UUID, UserDTO>()
     private val _userAccountsByEmail = ConcurrentHashMap<String, UserDTO>()
+    private val _passwordHashesByEmail = ConcurrentHashMap<String, String>()
 
     override val userAccountsById: Map<UUID, UserDTO> = _userAccountsById
     override val userAccountsByEmail: Map<String, UserDTO> = _userAccountsByEmail
+    override val passwordHashesByEmail: Map<String, String> = _passwordHashesByEmail
 
     override fun handle(event: IEvent) {
         when (event) {
@@ -25,6 +27,7 @@ class IdentityView(eventStore: IEventStore) : IIdentityView, AllConsumingView(ev
 
                 _userAccountsById.put(userDto.id, userDto)
                 _userAccountsByEmail.put(userDto.email, userDto)
+                _passwordHashesByEmail.put(userDto.email, event.passwordHash.value)
             }
         }
     }

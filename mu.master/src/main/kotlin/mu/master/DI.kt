@@ -2,11 +2,15 @@ package mu.master
 
 import mu.libs.cqrs.store.EventStore
 import mu.libs.cqrs.store.IEventStore
+import mu.libs.utils.Clock
+import mu.libs.utils.IClock
 import mu.master.identity.application.services.IIdentityService
 import mu.master.identity.application.services.IdentityService
 import mu.master.identity.domain.IUserAccountRepository
+import mu.master.identity.domain.services.IAuthTokenCreator
 import mu.master.identity.domain.services.IEmailAvailabilityChecker
 import mu.master.identity.domain.services.IPasswordHasher
+import mu.master.identity.infrastructure.AuthTokenCreator
 import mu.master.identity.infrastructure.EmailAvailabilityChecker
 import mu.master.identity.infrastructure.PasswordHasher
 import mu.master.identity.infrastructure.UserAccountRepository
@@ -22,7 +26,7 @@ import java.io.File
 
 object DI { // TODO Checkout https://salomonbrys.github.io/Kodein/?
     object Common {
-
+        val clock: IClock = Clock()
     }
 
     object Identity {
@@ -31,7 +35,8 @@ object DI { // TODO Checkout https://salomonbrys.github.io/Kodein/?
         val userAccountRepository: IUserAccountRepository = UserAccountRepository(eventStore)
         val passwordHasher: IPasswordHasher = PasswordHasher()
         val emailAvailabilityChecker: IEmailAvailabilityChecker = EmailAvailabilityChecker(identityView)
-        val identityService: IIdentityService = IdentityService(DI.Identity.identityView)
+        val authTokenCreator: IAuthTokenCreator = AuthTokenCreator(identityView, DI.Common.clock)
+        val identityService: IIdentityService = IdentityService(DI.Identity.identityView, passwordHasher, authTokenCreator)
     }
 
     object TeamsAndUsers {

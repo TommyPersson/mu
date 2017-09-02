@@ -18,6 +18,7 @@ dependencies {
     compile("com.graphql-java:graphql-java-tools:4.0.0")
 
     compile("de.mkammerer:argon2-jvm:2.2")
+    compile("io.jsonwebtoken:jjwt:0.7.0")
 
     compile("ch.qos.logback:logback-classic:$logbackVersion")
 }
