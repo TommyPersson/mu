@@ -1,27 +1,20 @@
 import * as React from "react"
 import * as ReactDOM from "react-dom"
-import App from "./App"
-import "./index.css"
-import { createStore, combineReducers } from "redux"
+import { createStore, applyMiddleware } from "redux"
 import { Provider } from "react-redux"
+import thunk from "redux-thunk"
 
 import { BrowserRouter } from "react-router-dom"
+import { appReducer } from "./app/reducers"
+import AppContainer from "./app/AppContainer"
+import { Route } from "react-router"
 
-const reducer = (state = [], action: { type: string }) => {
-    switch (action.type) {
-        default:
-            return state
-    }
-}
-
-const rootReducer = combineReducers({ reducer })
-
-const store = createStore(rootReducer)
+const store = createStore(appReducer, applyMiddleware(thunk))
 
 ReactDOM.render(
     <Provider store={store}>
         <BrowserRouter>
-            <App/>
+            <Route path="/" component={AppContainer} />
         </BrowserRouter>
     </Provider>,
     document.getElementById("root") as HTMLElement
